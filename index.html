@@ -1,8 +1,3 @@
-
-Pradeep Kumar Thiruganasambandam <pradeepkumar.t@kgkite.ac.in>
-9:52 AM (4 hours ago)
-to me
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,222 +77,250 @@ to me
         </div>
     </div>
 
-    <script>
-        const { PDFDocument, rgb, StandardFonts, PDFName, PDFNumber, PDFHexString, PDFString } = PDFLib;
+   <script>
+    const { PDFDocument, rgb, StandardFonts } = PDFLib;
 
-        // DOM elements
-        const uploadInput = document.getElementById('pdf-upload');
-        const uploadArea = document.getElementById('upload-area');
-        const fileListContainer = document.getElementById('file-list-container');
-        const fileList = document.getElementById('file-list');
-        const mergeBtn = document.getElementById('merge-btn');
-        const statusDiv = document.getElementById('status');
-        const downloadContainer = document.getElementById('download-container');
-        const downloadLink = document.getElementById('download-link');
-        const clearAllBtn = document.getElementById('clear-all-btn');
+    // DOM elements
+    const uploadInput = document.getElementById('pdf-upload');
+    const uploadArea = document.getElementById('upload-area');
+    const fileListContainer = document.getElementById('file-list-container');
+    const fileList = document.getElementById('file-list');
+    const mergeBtn = document.getElementById('merge-btn');
+    const statusDiv = document.getElementById('status');
+    const downloadContainer = document.getElementById('download-container');
+    const downloadLink = document.getElementById('download-link');
+    const clearAllBtn = document.getElementById('clear-all-btn');
 
-        let uploadedFiles = [];
-        
-        function addFiles(files) {
-            const newFiles = Array.from(files);
-            let filesAdded = 0;
-            newFiles.forEach(file => {
-                const isDuplicate = uploadedFiles.some(existingFile => 
-                    existingFile.name === file.name && existingFile.size === file.size
-                );
-
-                if (!isDuplicate && file.type === 'application/pdf') {
-                    uploadedFiles.push(file);
-                    filesAdded++;
-                }
-            });
-            
-            if(filesAdded > 0) {
-                 updateFileList();
-            }
-        }
-
-        uploadInput.addEventListener('change', (event) => {
-            if (event.target.files.length === 0) return;
-            addFiles(event.target.files);
-            event.target.value = ''; 
-        });
-        
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.firstElementChild.classList.add('border-blue-500', 'bg-blue-50');
-        });
-        uploadArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.firstElementChild.classList.remove('border-blue-500', 'bg-blue-50');
-        });
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.firstElementChild.classList.remove('border-blue-500', 'bg-blue-50');
-            addFiles(e.dataTransfer.files);
-        });
-
-        function updateFileList() {
-            fileList.innerHTML = ''; 
-            
-            if (uploadedFiles.length > 0) {
-                fileListContainer.classList.remove('hidden');
-                mergeBtn.disabled = false;
-            } else {
-                fileListContainer.classList.add('hidden');
-                mergeBtn.disabled = true;
-            }
-
-            uploadedFiles.forEach((file, index) => {
-                const li = document.createElement('li');
-                li.className = 'file-list-item flex items-center justify-between p-3 bg-gray-100 rounded-md';
-                li.innerHTML = `
-                    <div class="flex items-center overflow-hidden mr-2">
-                        <span class="font-medium text-sm truncate">${file.name}</span>
-                    </div>
-                    <div class="flex items-center flex-shrink-0">
-                        <span class="text-xs text-gray-500 mr-4">${(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                        <button class="remove-file-btn text-red-500 hover:text-red-700" data-index="${index}">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                fileList.appendChild(li);
-            });
-            downloadContainer.classList.add('hidden');
-        }
-
-        fileList.addEventListener('click', (event) => {
-            const removeBtn = event.target.closest('.remove-file-btn');
-            if (removeBtn) {
-                const indexToRemove = parseInt(removeBtn.dataset.index, 10);
-                uploadedFiles.splice(indexToRemove, 1);
-                updateFileList();
+    let uploadedFiles = [];
+    
+    function addFiles(files) {
+        const newFiles = Array.from(files);
+        let filesAdded = 0;
+        newFiles.forEach(file => {
+            const isDuplicate = uploadedFiles.some(existingFile => 
+                existingFile.name === file.name && existingFile.size === file.size
+            );
+            if (!isDuplicate && file.type === 'application/pdf') {
+                uploadedFiles.push(file);
+                filesAdded++;
             }
         });
-
-        clearAllBtn.addEventListener('click', () => {
-            uploadedFiles = [];
+        if(filesAdded > 0) {
             updateFileList();
-        });
+        }
+    }
 
-        mergeBtn.addEventListener('click', async () => {
-            if (uploadedFiles.length === 0) {
-                statusDiv.textContent = 'Please add one or more PDF files.';
-                return;
+    uploadInput.addEventListener('change', (event) => {
+        if (event.target.files.length === 0) return;
+        addFiles(event.target.files);
+        event.target.value = ''; 
+    });
+    
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        uploadArea.firstElementChild.classList.add('border-blue-500', 'bg-blue-50');
+    });
+    uploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        uploadArea.firstElementChild.classList.remove('border-blue-500', 'bg-blue-50');
+    });
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        uploadArea.firstElementChild.classList.remove('border-blue-500', 'bg-blue-50');
+        addFiles(e.dataTransfer.files);
+    });
+
+    function updateFileList() {
+        fileList.innerHTML = ''; 
+        if (uploadedFiles.length > 0) {
+            fileListContainer.classList.remove('hidden');
+            mergeBtn.disabled = false;
+        } else {
+            fileListContainer.classList.add('hidden');
+            mergeBtn.disabled = true;
+        }
+        uploadedFiles.forEach((file, index) => {
+            const li = document.createElement('li');
+            li.className = 'file-list-item flex items-center justify-between p-3 bg-gray-100 rounded-md';
+            li.innerHTML = `<div class="flex items-center overflow-hidden mr-2"><span class="font-medium text-sm truncate">${file.name}</span></div><div class="flex items-center flex-shrink-0"><span class="text-xs text-gray-500 mr-4">${(file.size / 1024 / 1024).toFixed(2)} MB</span><button class="remove-file-btn text-red-500 hover:text-red-700" data-index="${index}"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div>`;
+            fileList.appendChild(li);
+        });
+        downloadContainer.classList.add('hidden');
+    }
+
+    fileList.addEventListener('click', (event) => {
+        const removeBtn = event.target.closest('.remove-file-btn');
+        if (removeBtn) {
+            const indexToRemove = parseInt(removeBtn.dataset.index, 10);
+            uploadedFiles.splice(indexToRemove, 1);
+            updateFileList();
+        }
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+        uploadedFiles = [];
+        updateFileList();
+    });
+    
+    // --- MODIFIED FUNCTION ---
+    function drawTOCHeaders(page, fonts, dimensions, layout) {
+        const { boldFont } = fonts;
+        const { width, topMargin } = dimensions;
+        const { SNO_COL, FILENAME_COL, PAGENO_COL } = layout;
+        let y = topMargin;
+
+        page.drawText('Table of Contents', { x: 50, y, font: boldFont, size: 24, color: rgb(0, 0, 0) });
+        y -= 50;
+        
+        // Center "S.No."
+        const snoHeaderText = 'S.No.';
+        const snoHeaderWidth = boldFont.widthOfTextAtSize(snoHeaderText, 12);
+        page.drawText(snoHeaderText, { x: SNO_COL.X + (SNO_COL.WIDTH / 2) - (snoHeaderWidth / 2), y, font: boldFont, size: 12 });
+
+        // Left-align "File Name"
+        page.drawText('File Name', { x: FILENAME_COL.X, y, font: boldFont, size: 12 });
+
+        // Center "Page No."
+        const pageNoHeaderText = 'Page No.';
+        const pageNoHeaderWidth = boldFont.widthOfTextAtSize(pageNoHeaderText, 12);
+        page.drawText(pageNoHeaderText, { x: PAGENO_COL.X + (PAGENO_COL.WIDTH / 2) - (pageNoHeaderWidth / 2), y, font: boldFont, size: 12 });
+
+        y -= 10;
+        page.drawLine({ start: { x: 55, y: y }, end: { x: width - 55, y: y }, thickness: 1, color: rgb(0.8, 0.8, 0.8), });
+        y -= 20; 
+        return y;
+    }
+
+    mergeBtn.addEventListener('click', async () => {
+        if (uploadedFiles.length === 0) {
+            statusDiv.textContent = 'Please add one or more PDF files.';
+            return;
+        }
+
+        statusDiv.innerHTML = '<div class="flex items-center justify-center"><div class="loader w-6 h-6 border-4 rounded-full"></div><span class="ml-3">Processing... please wait.</span></div>';
+        mergeBtn.disabled = true;
+        downloadContainer.classList.add('hidden');
+
+        try {
+            const mergedPdf = await PDFDocument.create();
+            const tocEntries = [];
+            let contentStartPageIndex = 0;
+            for (const [index, file] of uploadedFiles.entries()) {
+                statusDiv.innerHTML = `<div class="flex items-center justify-center"><div class="loader w-6 h-6 border-4 rounded-full"></div><span class="ml-3">Reading file ${index + 1}/${uploadedFiles.length}</span></div>`;
+                tocEntries.push({ name: file.name, targetPageIndex: contentStartPageIndex });
+                const arrayBuffer = await file.arrayBuffer();
+                const donorPdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+                const copiedPages = await mergedPdf.copyPages(donorPdf, donorPdf.getPageIndices());
+                copiedPages.forEach(page => mergedPdf.addPage(page));
+                contentStartPageIndex += donorPdf.getPageCount();
             }
 
-            statusDiv.innerHTML = '<div class="flex items-center justify-center"><div class="loader w-6 h-6 border-4 rounded-full"></div><span class="ml-3">Processing... please wait.</span></div>';
-            mergeBtn.disabled = true;
-            downloadContainer.classList.add('hidden');
+            const font = await mergedPdf.embedFont(StandardFonts.Helvetica);
+            const boldFont = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
+            const A4_SIZE = { width: 595.28, height: 841.89 };
+            const TOP_MARGIN = A4_SIZE.height - 70;
+            const BOTTOM_MARGIN = 50;
+            const LINE_HEIGHT = 25;
+            const HEADER_SPACE = 105;
+            const ENTRIES_PER_PAGE = Math.floor((TOP_MARGIN - HEADER_SPACE - BOTTOM_MARGIN) / LINE_HEIGHT);
+            const numTocPages = Math.ceil(tocEntries.length / ENTRIES_PER_PAGE);
 
-            try {
-                const mergedPdf = await PDFDocument.create();
-                const tocPage = mergedPdf.addPage();
-                const { width, height } = tocPage.getSize();
-                const font = await mergedPdf.embedFont(StandardFonts.Helvetica);
-                const boldFont = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
-                
-                let currentPageNumber = 1;
-                const tocEntries = [];
-
-                for (const file of uploadedFiles) {
-                    statusDiv.innerHTML = `<div class="flex items-center justify-center"><div class="loader w-6 h-6 border-4 rounded-full"></div><span class="ml-3">Processing ${file.name}...</span></div>`;
-                    
-                    tocEntries.push({ name: file.name, page: currentPageNumber + 1 });
-
-                    const arrayBuffer = await file.arrayBuffer();
-                    const donorPdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-                    const copiedPages = await mergedPdf.copyPages(donorPdf, donorPdf.getPageIndices());
-                    copiedPages.forEach(page => mergedPdf.addPage(page));
-
-                    currentPageNumber += donorPdf.getPageCount();
-                }
-
-                statusDiv.innerHTML = '<div class="flex items-center justify-center"><div class="loader w-6 h-6 border-4 rounded-full"></div><span class="ml-3">Creating index page...</span></div>';
-                let y = height - 70;
-                tocPage.drawText('Table of Contents', {
-                    x: 50, y, font: boldFont, size: 24, color: rgb(0, 0, 0),
+            statusDiv.innerHTML = '<div class="flex items-center justify-center"><div class="loader w-6 h-6 border-4 rounded-full"></div><span class="ml-3">Creating index pages...</span></div>';
+            for (let i = 0; i < numTocPages; i++) {
+                mergedPdf.insertPage(i, [A4_SIZE.width, A4_SIZE.height]);
+            }
+            
+            statusDiv.innerHTML = '<div class="flex items-center justify-center"><div class="loader w-6 h-6 border-4 rounded-full"></div><span class="ml-3">Adding navigation links...</span></div>';
+            const firstTocPageRef = mergedPdf.getPage(0).ref;
+            for (let i = numTocPages; i < mergedPdf.getPageCount(); i++) {
+                const page = mergedPdf.getPage(i);
+                const { width, height } = page.getSize();
+                const hotspotSize = 50;
+                const xPos = width - hotspotSize - 10;
+                const yPos = 10;
+                const linkAnnotation = mergedPdf.context.obj({
+                    Type: 'Annot', Subtype: 'Link',
+                    Rect: [xPos, yPos, xPos + hotspotSize, yPos + hotspotSize],
+                    Border: [0, 0, 0],
+                    A: { Type: 'Action', S: 'GoTo', D: [firstTocPageRef, 'Fit'] },
                 });
-                y -= 50;
-                const linkColor = rgb(0, 0.4, 0.8);
+                page.node.addAnnot(linkAnnotation);
+            }
 
-                for (const entry of tocEntries) {
-                    if (y < 50) { 
-                        break; 
-                    }
+            statusDiv.innerHTML = '<div class="flex items-center justify-center"><div class="loader w-6 h-6 border-4 rounded-full"></div><span class="ml-3">Finalizing TOC...</span></div>';
+            
+            // Define layout constants for the table
+            const TOC_LAYOUT = {
+                SNO_COL:      { X: 55,  WIDTH: 55 },
+                FILENAME_COL: { X: 115 },
+                PAGENO_COL:   { X: A4_SIZE.width - 125, WIDTH: 70 }
+            };
+
+            for (let tocPageIndex = 0; tocPageIndex < numTocPages; tocPageIndex++) {
+                const tocPage = mergedPdf.getPage(tocPageIndex);
+                const { width, height } = tocPage.getSize();
+                
+                let y = drawTOCHeaders(tocPage, { font, boldFont }, { width, topMargin: height - 70 }, TOC_LAYOUT);
+                
+                const startIndex = tocPageIndex * ENTRIES_PER_PAGE;
+                const endIndex = Math.min(startIndex + ENTRIES_PER_PAGE, tocEntries.length);
+                const entriesForThisPage = tocEntries.slice(startIndex, endIndex);
+
+                for (const [itemIndex, entry] of entriesForThisPage.entries()) {
+                    const finalPageNumberToDisplay = numTocPages + entry.targetPageIndex + 1;
+                    const targetPage = mergedPdf.getPage(finalPageNumberToDisplay - 1);
+                    const serialNumber = startIndex + itemIndex + 1;
+
+                    // --- CENTER S.NO. ---
+                    const snoText = `${serialNumber}.`;
+                    const snoTextWidth = font.widthOfTextAtSize(snoText, 11);
+                    const snoX = TOC_LAYOUT.SNO_COL.X + (TOC_LAYOUT.SNO_COL.WIDTH / 2) - (snoTextWidth / 2);
+                    tocPage.drawText(snoText, { x: snoX, y, font, size: 11, color: rgb(0.2, 0.2, 0.2) });
                     
-                    // FIXED: Replaced the broken/non-functional code with the correct way to create clickable links.
-                    // This section now correctly generates a link annotation for each entry in the table of contents.
-                    const targetPage = mergedPdf.getPage(entry.page - 1);
-                    const text = entry.name;
-                    
-                    // Truncate long file names
-                    let truncatedText = text;
-                    const maxTextWidth = width - 200;
-                    if (font.widthOfTextAtSize(text, 12) > maxTextWidth) {
+                    // --- FILE NAME (LEFT-ALIGNED) ---
+                    let truncatedText = entry.name;
+                    const maxTextWidth = (width - 250);
+                    if (font.widthOfTextAtSize(truncatedText, 12) > maxTextWidth) {
                         let currentWidth = 0;
-                        for (let i = 0; i < text.length; i++) {
-                            currentWidth += font.widthOfTextAtSize(text[i], 12);
-                            if (currentWidth > maxTextWidth - 20) {
-                                truncatedText = text.substring(0, i) + '...';
-                                break;
-                            }
+                        for (let k = 0; k < truncatedText.length; k++) {
+                            currentWidth += font.widthOfTextAtSize(truncatedText[k], 12);
+                            if (currentWidth > maxTextWidth - 20) { truncatedText = truncatedText.substring(0, k) + '...'; break; }
                         }
                     }
-
-                    // Draw the text for the file name
-                    tocPage.drawText(truncatedText, { x: 60, y, font, size: 12, color: linkColor });
+                    tocPage.drawText(truncatedText, { x: TOC_LAYOUT.FILENAME_COL.X, y, font, size: 12, color: rgb(0, 0.4, 0.8) });
                     
-                    // Draw the page number text
-                    tocPage.drawText(`Page ${entry.page}`, {
-                        x: width - 120, y, font, size: 12, color: rgb(0.3, 0.3, 0.3),
-                    });
-                    
-                    // Add the clickable link annotation
-                    const linkRect = {
-                      x: 55, // Start of clickable area
-                      y: y - 2,
-                      width: width - 170, // Width of clickable area (don't include page number)
-                      height: 14, // Height of the clickable area
-                    };
+                    // --- CENTER PAGE NO. ---
+                    const pageNoText = `${finalPageNumberToDisplay}`;
+                    const pageNoTextWidth = font.widthOfTextAtSize(pageNoText, 12);
+                    const pageNoX = TOC_LAYOUT.PAGENO_COL.X + (TOC_LAYOUT.PAGENO_COL.WIDTH / 2) - (pageNoTextWidth / 2);
+                    tocPage.drawText(pageNoText, { x: pageNoX, y, font, size: 12, color: rgb(0.2, 0.2, 0.2) });
 
+                    // --- LINK ANNOTATION (NO CHANGE) ---
+                    const linkRect = { x: TOC_LAYOUT.FILENAME_COL.X, y: y - 2, width: maxTextWidth, height: 14 };
                     const linkAnnotation = mergedPdf.context.obj({
-                      Type: 'Annot',
-                      Subtype: 'Link',
-                      Rect: [linkRect.x, linkRect.y, linkRect.x + linkRect.width, linkRect.y + linkRect.height],
-                      Border: [0, 0, 0], // No visible border for the link
-                      A: { // The action to perform on click
-                        Type: 'Action',
-                        S: 'GoTo',
-                        D: [targetPage.ref, 'Fit'], // Go to the top of the target page
-                      },
+                        Type: 'Annot', Subtype: 'Link',
+                        Rect: [linkRect.x, linkRect.y, linkRect.x + linkRect.width, linkRect.y + linkRect.height],
+                        Border: [0, 0, 0],
+                        A: { Type: 'Action', S: 'GoTo', D: [targetPage.ref, 'Fit'] },
                     });
                     tocPage.node.addAnnot(linkAnnotation);
-
-                    y -= 25; // Move down for the next entry
+                    y -= LINE_HEIGHT;
                 }
-
-                const pdfBytes = await mergedPdf.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
-                downloadLink.href = url;
-                downloadContainer.classList.remove('hidden');
-                
-                statusDiv.textContent = 'Your merged PDF is ready!';
-                mergeBtn.disabled = false;
-                
-            } catch (error) {
-                console.error(error);
-                statusDiv.textContent = `An error occurred: ${error.message}`;
-                mergeBtn.disabled = false;
             }
-        });
-    </script>
+
+            const pdfBytes = await mergedPdf.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            downloadLink.href = url;
+            downloadContainer.classList.remove('hidden');
+            statusDiv.textContent = '✅ Your merged PDF is ready!';
+            mergeBtn.disabled = false;
+        } catch (error) {
+            console.error(error);
+            statusDiv.textContent = `An error occurred: ${error.message}`;
+            mergeBtn.disabled = false;
+        }
+    });
+</script>
 </body>
 </html>
